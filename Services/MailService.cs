@@ -8,7 +8,7 @@ namespace OnlineShop.Services
     public class MailService
     {
         private string gmail_account = "gary60430";
-        private string gmail_password = "ggg1992516";
+        private string gmail_password = "";
         private string gmail_mail = "gary60430@gmail.com";
 
         #region 取得亂數驗證碼
