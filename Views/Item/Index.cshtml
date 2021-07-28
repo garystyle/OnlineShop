@@ -1,0 +1,118 @@
+﻿@model OnlineShop.ViewModels.ItemViewModel
+
+@{
+    ViewBag.Title = "商品首頁";
+}
+
+<div id="ItemList" class="table-responsive">
+    <div class="page-header">
+        <h1>商品項目</h1>
+    </div>
+    <table class="table-hover">
+        @if (!Model.IdList.Count.Equals(0))
+        {
+            @*計算列數，每5個一列*@
+            int row = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(Model.IdList.Count) / 5));
+
+            for (int r = 0; r < row; r++)
+            {
+                for (int i = 5 * r; i < (r + 1) * 5; i++)
+                {
+                    if (i < Model.IdList.Count)
+                    {
+                        <tr>
+                            <td id="ItemBlock-@(Model.IdList[i])">
+                                @Html.Partial("ItemBlock", Model.ItemBlock[i])
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4">
+                    尚未有商品上架!
+                </td>
+            </tr>
+
+        }
+    </table>
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <text>要使用購物車請先</text>
+        @Html.ActionLink("登入", "Login", "Members")
+    }
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <a href="@Url.Action("Create")">
+            <input class="btn btn-primary" type="button" value="新增商品" />
+        </a>
+    }
+    <div class="col-xs-12 text-center">
+        <ul class="pagination">
+            @*顯示上一頁與最前頁按鈕*@
+            <li class="first @((Model.Paging.NowPage > 1) ? "":"disabled")">
+                @Ajax.ActionLink("<<", "Index", new { Page = 1},
+               new AjaxOptions
+               {
+                   InsertionMode = InsertionMode.Replace,
+                   UpdateTargetId = "ItemList"
+               })
+            </li>
+            <li class="previous @((Model.Paging.NowPage > 1) ? "":"disabled")">
+                @Ajax.ActionLink("<", "Index", new { Page = Model.Paging.NowPage-1},
+               new AjaxOptions
+               {
+                   InsertionMode = InsertionMode.Replace,
+                   UpdateTargetId = "ItemList"
+               })
+            </li>
+            @*顯示當前頁數前後各五頁的頁數*@
+            @for (var page = Model.Paging.NowPage - 6; page < Model.Paging.NowPage + 6; page++)
+            {
+                if ((page > 0) && (page <= Model.Paging.MaxPage))
+                {
+                    if (page == Model.Paging.NowPage)
+                    {
+                        <li class="active">
+                            <a href="#">@page</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            @Ajax.ActionLink(page.ToString(), "Index", new { Page = page},
+                            new AjaxOptions
+                            {
+                                InsertionMode = InsertionMode.Replace,
+                                UpdateTargetId = "ItemList"
+                            })
+                        </li>
+
+                    }
+                }
+            }
+            @*若目前所在頁數小於總頁數，則顯示下一頁與最後一頁的按鈕*@
+            <li class="next @(((Model.Paging.NowPage < Model.Paging.MaxPage) ? "" : "disabled"))">
+                @Ajax.ActionLink(">", "Index", new { Page = Model.Paging.NowPage+1},
+                new AjaxOptions
+                {
+                    InsertionMode = InsertionMode.Replace,
+                    UpdateTargetId = "ItemList"
+                })
+            </li>
+            <li class="last @(((Model.Paging.NowPage < Model.Paging.MaxPage) ? "" : "disabled"))">
+                @Ajax.ActionLink(">>", "Index", new { Page = Model.Paging.MaxPage},
+                new AjaxOptions
+                {
+                    InsertionMode = InsertionMode.Replace,
+                    UpdateTargetId = "ItemList"
+                })
+            </li>
+        </ul>
+    </div>
+</div>
+
+
